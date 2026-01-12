@@ -2,91 +2,103 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>HuiBlox | Cloud Panel</title>
+    <title>HUIBLOX | Cloud Panel</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="/socket.io/socket.io.js"></script>
     <style>
-        .drag-card { cursor: grab; }
-        .drag-card:active { cursor: grabbing; }
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 10px; }
+        .drag-card { cursor: grab; transition: transform 0.2s; }
+        .drag-card:active { cursor: grabbing; transform: scale(1.02); }
     </style>
 </head>
-<body class="bg-[#0a0a0c] text-slate-200 font-sans min-h-screen">
+<body class="bg-[#0f1115] text-slate-200 min-h-screen">
 
     <div id="auth-screen" class="fixed inset-0 flex items-center justify-center bg-black z-50">
-        <div class="bg-gray-900 p-8 rounded-2xl border border-blue-500/20 w-96 shadow-2xl">
-            <h1 class="text-3xl font-black text-blue-500 mb-6 text-center italic">HUIBLOX</h1>
-            <input id="w-user" type="text" placeholder="Логин панели" class="w-full bg-gray-800 p-3 rounded-lg mb-3 border border-gray-700">
-            <input id="w-pass" type="password" placeholder="Пароль панели" class="w-full bg-gray-800 p-3 rounded-lg mb-6 border border-gray-700">
-            <button onclick="webLogin()" class="w-full bg-blue-600 p-3 rounded-lg font-bold hover:bg-blue-500 transition">ВОЙТИ В ПАНЕЛЬ</button>
-            <button onclick="webReg()" class="w-full mt-2 text-gray-500 text-sm hover:underline">Создать аккаунт</button>
+        <div class="bg-[#161920] p-8 rounded-3xl border border-blue-500/20 w-full max-w-sm shadow-2xl">
+            <h1 class="text-4xl font-black text-blue-500 mb-8 text-center italic tracking-tighter">HUIBLOX</h1>
+            <div class="space-y-4">
+                <input id="w-user" type="text" placeholder="Логин" class="w-full bg-[#1c212b] p-3 rounded-xl border border-gray-800 outline-none focus:border-blue-500">
+                <input id="w-pass" type="password" placeholder="Пароль" class="w-full bg-[#1c212b] p-3 rounded-xl border border-gray-800 outline-none focus:border-blue-500">
+                <div class="grid grid-cols-2 gap-3 pt-2">
+                    <button onclick="webLogin()" class="bg-blue-600 p-3 rounded-xl font-bold hover:bg-blue-500">ВХОД</button>
+                    <button onclick="webReg()" class="bg-gray-800 p-3 rounded-xl font-bold hover:bg-gray-700">РЕГ</button>
+                </div>
+            </div>
         </div>
     </div>
 
     <div id="main-panel" class="hidden p-6 max-w-7xl mx-auto">
-        <header class="flex justify-between items-center mb-10">
-            <h1 class="text-4xl font-black text-blue-500 italic">HUIBLOX</h1>
-            <div id="status" class="bg-blue-500/10 text-blue-400 px-4 py-1 rounded-full border border-blue-500/20 text-sm">Ожидание...</div>
+        <header class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-black text-blue-500 italic">HUIBLOX</h1>
+            <div class="flex items-center gap-4">
+                <div id="status" class="bg-blue-500/10 text-blue-400 px-4 py-1 rounded-full border border-blue-500/20 text-xs">Ожидание...</div>
+                <button onclick="location.reload()" class="text-xs text-gray-500 hover:text-red-500">ВЫЙТИ</button>
+            </div>
         </header>
 
         <div id="grid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-            <div draggable="true" ondragstart="drag(event)" id="m1" class="drag-card bg-gray-900 p-6 rounded-2xl border border-gray-800 shadow-xl">
-                <h3 class="text-blue-400 font-bold mb-4 flex items-center gap-2">🔗 Minecraft Server</h3>
-                <input id="mc-host" type="text" placeholder="IP Сервера" class="w-full bg-gray-800 p-2 rounded mb-2 border border-gray-700 text-sm">
-                <input id="mc-user" type="text" placeholder="Ник бота" class="w-full bg-gray-800 p-2 rounded mb-2 border border-gray-700 text-sm">
-                <input id="mc-pass" type="password" placeholder="Пароль /reg" class="w-full bg-gray-800 p-2 rounded mb-4 border border-gray-700 text-sm">
-                <button onclick="connectMC()" class="w-full bg-blue-600 p-2 rounded font-bold text-sm">ЗАПУСТИТЬ БОТА</button>
+            <div draggable="true" ondragstart="drag(event)" id="m1" class="drag-card bg-[#161920] p-6 rounded-2xl border border-gray-800">
+                <h3 class="text-blue-400 font-bold mb-4 text-sm uppercase">Подключение к MC</h3>
+                <input id="mc-host" type="text" placeholder="IP Сервера" class="w-full bg-[#1c212b] p-2 rounded mb-2 border border-gray-800 text-sm">
+                <input id="mc-user" type="text" placeholder="Ник бота" class="w-full bg-[#1c212b] p-2 rounded mb-2 border border-gray-800 text-sm">
+                <input id="mc-pass" type="password" placeholder="Пароль /reg" class="w-full bg-[#1c212b] p-2 rounded mb-4 border border-gray-800 text-sm">
+                <button onclick="connectMC()" class="w-full bg-blue-600 py-2 rounded-lg font-bold text-xs">ЗАПУСТИТЬ</button>
             </div>
 
-            <div draggable="true" ondragstart="drag(event)" id="m2" class="drag-card bg-gray-900 p-6 rounded-2xl border border-gray-800 shadow-xl">
-                <h3 class="text-purple-400 font-bold mb-4">👥 Игроки рядом</h3>
-                <div id="playerList" class="space-y-1 max-h-40 overflow-y-auto text-xs text-gray-400"></div>
-            </div>
-
-            <div draggable="true" ondragstart="drag(event)" id="m3" class="drag-card bg-gray-900 p-6 rounded-2xl border border-gray-800 shadow-xl h-80 flex flex-col">
-                <h3 class="text-yellow-400 font-bold mb-2">💬 Чат</h3>
-                <div id="chatLog" class="flex-1 overflow-y-auto bg-black/50 p-2 rounded mb-2 text-[10px] font-mono"></div>
-                <input id="chatInput" type="text" placeholder="Написать..." class="w-full bg-gray-800 p-2 rounded border border-gray-700 text-sm">
-            </div>
-
-            <div draggable="true" ondragstart="drag(event)" id="m4" class="drag-card bg-gray-900 p-6 rounded-2xl border border-gray-800 shadow-xl col-span-1 md:col-span-2">
-                <h3 class="text-orange-400 font-bold mb-4">🎒 Инвентарь</h3>
-                <div id="invGrid" class="grid grid-cols-6 gap-2"></div>
-            </div>
-
-            <div draggable="true" ondragstart="drag(event)" id="m5" class="drag-card bg-gray-900 p-6 rounded-2xl border border-gray-800 shadow-xl flex flex-col items-center">
-                <h3 class="text-green-400 font-bold mb-4 w-full text-left">🎮 WASD</h3>
-                <div class="grid grid-cols-3 gap-1 mb-4">
-                    <div></div><button onmousedown="mcMove('forward',true)" onmouseup="mcMove('forward',false)" class="bg-gray-700 p-3 rounded">W</button><div></div>
-                    <button onmousedown="mcMove('left',true)" onmouseup="mcMove('left',false)" class="bg-gray-700 p-3 rounded">A</button>
-                    <button onmousedown="mcMove('back',true)" onmouseup="mcMove('back',false)" class="bg-gray-700 p-3 rounded">S</button>
-                    <button onmousedown="mcMove('right',true)" onmouseup="mcMove('right',false)" class="bg-gray-700 p-3 rounded">D</button>
+            <div draggable="true" ondragstart="drag(event)" id="mStats" class="drag-card bg-[#161920] p-6 rounded-2xl border border-gray-800">
+                <h3 class="text-red-400 font-bold mb-4 text-sm uppercase">Статистика</h3>
+                <div class="flex justify-around items-center h-24 text-2xl">
+                    <div class="text-center">❤️ <span id="hp" class="block text-sm mt-1">20</span></div>
+                    <div class="text-center">🍖 <span id="food" class="block text-sm mt-1">20</span></div>
                 </div>
-                <button onclick="socket.emit('attack')" class="w-full bg-red-900/40 border border-red-500 text-red-500 py-1 rounded">АТАКА</button>
             </div>
 
+            <div draggable="true" ondragstart="drag(event)" id="m3" class="drag-card bg-[#161920] p-6 rounded-2xl border border-gray-800 h-80 flex flex-col">
+                <h3 class="text-yellow-400 font-bold mb-2 text-sm uppercase">Чат сервера</h3>
+                <div id="chatLog" class="flex-1 overflow-y-auto bg-black/30 p-2 rounded-lg mb-2 text-[10px] font-mono leading-relaxed"></div>
+                <input id="chatInput" type="text" placeholder="Написать..." class="w-full bg-[#1c212b] p-2 rounded-lg border border-gray-800 text-sm outline-none">
+            </div>
+
+            <div draggable="true" ondragstart="drag(event)" id="m2" class="drag-card bg-[#161920] p-6 rounded-2xl border border-gray-800">
+                <h3 class="text-purple-400 font-bold mb-4 text-sm uppercase">Игроки рядом</h3>
+                <div id="playerList" class="grid grid-cols-1 gap-1 max-h-40 overflow-y-auto text-xs text-gray-500"></div>
+            </div>
+
+            <div draggable="true" ondragstart="drag(event)" id="m5" class="drag-card bg-[#161920] p-6 rounded-2xl border border-gray-800 flex flex-col items-center">
+                <h3 class="text-green-400 font-bold mb-4 w-full text-sm uppercase">Управление</h3>
+                <div class="grid grid-cols-3 gap-1 mb-4">
+                    <div></div><button onmousedown="mcMove('forward',true)" onmouseup="mcMove('forward',false)" class="bg-[#1c212b] p-4 rounded-xl border border-gray-800">W</button><div></div>
+                    <button onmousedown="mcMove('left',true)" onmouseup="mcMove('left',false)" class="bg-[#1c212b] p-4 rounded-xl border border-gray-800">A</button>
+                    <button onmousedown="mcMove('back',true)" onmouseup="mcMove('back',false)" class="bg-[#1c212b] p-4 rounded-xl border border-gray-800">S</button>
+                    <button onmousedown="mcMove('right',true)" onmouseup="mcMove('right',false)" class="bg-[#1c212b] p-4 rounded-xl border border-gray-800">D</button>
+                </div>
+                <button onclick="socket.emit('attack')" class="w-full bg-red-500/10 text-red-500 border border-red-500/20 py-2 rounded-xl text-xs font-bold">УДАРИТЬ</button>
+            </div>
         </div>
     </div>
 
     <script>
         const socket = io();
 
-        // 1. Авторизация на сайте
+        // АВТОРИЗАЦИЯ
         function webLogin() {
             socket.emit('web-login', { user: document.getElementById('w-user').value, pass: document.getElementById('w-pass').value });
         }
         function webReg() {
             socket.emit('web-reg', { user: document.getElementById('w-user').value, pass: document.getElementById('w-pass').value });
         }
-        socket.on('auth-success', () => {
-            document.getElementById('auth-screen').classList.add('hidden');
-            document.getElementById('main-panel').classList.remove('hidden');
-        });
-        socket.on('auth-error', (m) => alert(m));
 
-        // 2. Бот Minecraft
+        socket.on('auth-success', (type) => {
+            if(type === 'reg') {
+                alert("Аккаунт создан! Теперь нажмите ВХОД.");
+            } else {
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('main-panel').classList.remove('hidden');
+            }
+        });
+
+        socket.on('auth-error', (msg) => alert(msg));
+
+        // MC БОТ
         function connectMC() {
             socket.emit('join-mc', {
                 host: document.getElementById('mc-host').value,
@@ -97,32 +109,37 @@
         function mcMove(type, state) { socket.emit('move', { type, state }); }
 
         socket.on('status', s => document.getElementById('status').innerText = s);
+        socket.on('stats', d => {
+            document.getElementById('hp').innerText = d.hp;
+            document.getElementById('food').innerText = d.food;
+        });
+
         socket.on('chat', m => {
             const log = document.getElementById('chatLog');
-            log.innerHTML += `<div>${m}</div>`;
+            const d = document.createElement('div');
+            d.className = "mb-1 border-b border-white/5 pb-1";
+            d.textContent = m;
+            log.appendChild(d);
             log.scrollTop = log.scrollHeight;
         });
 
         socket.on('update-data', (data) => {
-            const pList = document.getElementById('playerList');
-            pList.innerHTML = data.players.map(p => `<div class="bg-gray-800 p-1 rounded">👤 ${p}</div>`).join('');
-
-            const iGrid = document.getElementById('invGrid');
-            iGrid.innerHTML = data.items.map(i => `<div class="bg-black/40 p-2 rounded text-[10px] text-center border border-white/5">${i.name} x${i.count}</div>`).join('');
+            document.getElementById('playerList').innerHTML = data.players.map(p => 
+                `<div class="bg-gray-800/40 p-1 px-2 rounded-md">👤 ${p}</div>`
+            ).join('');
         });
 
         document.getElementById('chatInput').addEventListener('keypress', (e) => {
             if(e.key === 'Enter') { socket.emit('send-chat', e.target.value); e.target.value = ''; }
         });
 
-        // 3. Drag and Drop
+        // DRAG AND DROP
         function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
         document.addEventListener('dragover', (ev) => ev.preventDefault());
         document.addEventListener('drop', (ev) => {
             ev.preventDefault();
             const id = ev.dataTransfer.getData("text");
-            const grid = document.getElementById('grid');
-            grid.appendChild(document.getElementById(id));
+            document.getElementById('grid').appendChild(document.getElementById(id));
         });
     </script>
 </body>
