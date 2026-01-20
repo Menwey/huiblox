@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Huiblox - Goodbye</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #111;
+            font-family: "Segoe UI", Tahoma, sans-serif;
+            color: white;
+        }
+
+  
+        #bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            background: rgba(27, 29, 30, 0.8); 
+            backdrop-filter: blur(10px); 
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        h1 { color: #00a2ff; font-size: 3rem; margin-bottom: 5px; }
+        .lang-label { background: #00a2ff; color: #000; padding: 2px 10px; border-radius: 5px; font-weight: bold; }
+        p { line-height: 1.6; font-size: 1.2rem; }
+        hr { width: 80%; border: 0; border-top: 1px solid #444; margin: 25px 0; }
+
+
+        .music-player {
+            margin-top: 20px;
+            opacity: 0.5;
+            transition: 0.3s;
+        }
+        .music-player:hover { opacity: 1; }
+    </style>
+</head>
+<body>
+
+    <canvas id="bg"></canvas>
+
+    <div class="container">
+        <h1>Huiblox</h1>
+        
+        <div class="version">
+            <span class="lang-label">EN</span>
+            <p>Hello everyone, Huiblox is closed cuz I can't make fucking RCC.<br>
+            Thank you all for the past week. Goodbye yall</p>
+        </div>
+
+        <hr>
+
+        <div class="version">
+            <span class="lang-label">RU</span>
+            <p>Всем привет, Huiblox закрыт, т.к у нас не получилось завести рсс.<br>
+            Спасибо за эту неделю.</p>
+        </div>
+
+        <div class="music-player">
+            <p style="font-size: 0.8rem;">Background Music:</p>
+            <audio controls autoplay loop>
+                <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+                Ваш браузер не поддерживает аудио.
+            </audio>
+        </div>
+    </div>
+
+    <script>
+
+        const canvas = document.getElementById('bg');
+        const ctx = canvas.getContext('2d');
+        let pts = [];
+
+        function init() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            pts = [];
+            for(let i=0; i<100; i++) {
+                pts.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    v: Math.random() * 0.5 + 0.2
+                });
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "#00a2ff";
+            pts.forEach(p => {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, 1, 0, Math.PI*2);
+                ctx.fill();
+                p.y -= p.v;
+                if(p.y < 0) p.y = canvas.height;
+            });
+            requestAnimationFrame(draw);
+        }
+
+        window.addEventListener('resize', init);
+        init();
+        draw();
+    </script>
+</body>
+</html>
