@@ -1,0 +1,52 @@
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+
+local Window = Rayfield:CreateWindow({
+   Name = "Abyss Tool Giver | By Realdevchik",
+   LoadingTitle = "Loading script...",
+   LoadingSubtitle = "by Realdevchik",
+   ConfigurationSaving = {
+      Enabled = false,
+      FolderName = nil,
+      FileName = "AbyssToolGiver"
+   },
+   Discord = {
+      Enabled = true,
+      Invite = "discord.gg/bJbD8CdtN6", 
+      RememberJoins = true 
+   },
+   KeySystem = false, 
+})
+
+
+local MainTab = Window:CreateTab("Main", 4483362458) -- Иконка дома
+
+
+local Section = MainTab:CreateSection("Items")
+
+
+local Button = MainTab:CreateButton({
+   Name = "Equip Dev Items (Gun & Mine)",
+   Callback = function()
+
+      local args1 = {
+          [1] = "guns",
+          [2] = "Developer"
+      }
+      game:GetService("ReplicatedStorage").common.packages.Knit.Services.InventoryService.RF.EquipItem:InvokeServer(unpack(args1))
+
+      local args2 = {
+          [1] = "tubes",
+          [2] = "Sea Mine"
+      }
+      game:GetService("ReplicatedStorage").common.packages.Knit.Services.InventoryService.RF.EquipItem:InvokeServer(unpack(args2))
+      
+
+      Rayfield:Notify({
+         Title = "Success",
+         Content = "Items have been equipped!",
+         Duration = 3.5,
+         Image = 4483362458,
+      })
+   end,
+})
